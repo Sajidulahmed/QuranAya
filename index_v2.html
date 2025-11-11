@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QuranAya.Pi — Dashboard v2</title>
+  <style>
+    :root{
+      --bg1:#072B45;--bg2:#0f4160;--accent:#ffd166;--muted:#cfcfcf;--card:rgba(255,255,255,0.04);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;
+      background:linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#eef8ff;padding:18px;display:flex;justify-content:center;
+    }
+    .wrap{width:100%;max-width:760px}
+    .hero{background:var(--card);border-radius:14px;padding:28px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.4)}
+    .logo{font-size:42px;font-weight:700;color:var(--accent)}
+    .bismillah{font-style:italic;color:#ffe5b3;margin-top:8px}
+    .subtitle{font-size:14px;color:var(--muted);margin-top:10px}
+    .grid{display:grid;gap:14px;margin-top:18px}
+    @media(min-width:820px){.grid{grid-template-columns:1fr 330px}}
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,0.3)}
+    h3{margin-top:0;color:var(--accent)}
+    .input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#fff}
+    .btn{background:var(--accent);color:#07303b;padding:9px 12px;border:none;border-radius:10px;font-weight:700;cursor:pointer}
+    .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.1)}
+    footer{text-align:center;color:var(--muted);margin-top:20px;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="logo">🌙 QuranAya.Pi</div>
+      <div class="bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</div>
+      <div class="subtitle">Islamic Dashboard — Peace • Purpose • Pi</div>
+    </div>
+
+    <div class="grid">
+      <!-- Left column -->
+      <div>
+        <div class="card">
+          <h3>📖 Daily Ayah</h3>
+          <div id="ayahBox">
+            <p id="ayahArabic">ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَالَمِينَ</p>
+            <p id="ayahTrans" style="color:var(--muted)">“All praise is due to Allah, Lord of the worlds.” (Al-Fatiha)</p>
+            <button class="btn secondary" onclick="newAyah()">New Ayah</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>💰 Zakat Calculator</h3>
+          <input id="zakatAmount" class="input" placeholder="Enter amount (e.g. 10000)" type="number">
+          <button class="btn" style="margin-left:8px" onclick="calcZakat()">Calculate</button>
+          <p id="zakatResult" style="color:var(--muted);margin-top:8px"></p>
+        </div>
+
+        <div class="card">
+          <h3>🪙 Donate / Pi Utility</h3>
+          <p style="color:var(--muted)">Placeholder for Pi payment integration.</p>
+          <button class="btn" onclick="alert('Pi payment placeholder — integrate Pi SDK later')">Donate with Pi</button>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        <div class="card">
+          <h3>🕋 Prayer Times</h3>
+          <p id="localTime" style="color:var(--muted)">Local time: --:--</p>
+          <div>
+            <input id="cityInput" class="input" placeholder="City (e.g. Guwahati)">
+            <input id="countryInput" class="input" placeholder="Country (e.g. India)">
+            <button class="btn secondary" id="cityLookupBtn">Get Times by City</button>
+            <button class="btn" id="locBtn">Use My Location</button>
+          </div>
+          <div id="prayerList" style="margin-top:12px;font-size:14px;color:#fff"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>© 2025 QuranAya.Pi — Built with Noor & Pi 🌙</footer>
+  </div>
+
+  <script>
+    /* Daily Ayah Data */
+    const ayahs = [
+      { arab:"ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَالَمِينَ",trans:"All praise is due to Allah, Lord of the worlds. — (Al-Fatiha)" },
+      { arab:"إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",trans:"Indeed, with hardship comes ease. — (Ash-Sharh 94:6)" },
+      { arab:"رَبِّ زِدْنِى عِلْمًا",trans:"My Lord, increase me in knowledge. — (Tā-Hā 20:114)" },
+      { arab:"وَمَا تَوْفِيقِى إِلَّا بِاللَّهِ",trans:"My success is only by Allah. — (Hud 11:88)" }
+    ];
+    function newAyah(){
+      const pick = ayahs[Math.floor(Math.random()*ayahs.length)];
+      document.getElementById("ayahArabic").textContent = pick.arab;
+      document.getElementById("ayahTrans").textContent = pick.trans;
+    }
+
+    /* Zakat Calculator */
+    function calcZakat(){
+      const amount = parseFloat(document.getElementById('zakatAmount').value||0);
+      if(amount<=0){document.getElementById('zakatResult').textContent="Enter valid amount.";return;}
+      const zakat = (amount*2.5)/100;
+      document.getElementById('zakatResult').textContent="Zakat due: "+zakat.toFixed(2);
+    }
+
+    /* Time Display */
+    function setLocalTime(){
+      const now=new Date();
+      document.getElementById('localTime').textContent="Local time: "+now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    }
+    setInterval(setLocalTime,60000); setLocalTime();
+
+    /* Prayer Times (AlAdhan API) */
+    async function fetchByCity(city,country){
+      const url=`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`;
+      const res=await fetch(url); const data=await res.json();
+      if(data.code!==200){throw new Error('Error fetching prayer times');}
+      return data.data.timings;
+    }
+    function renderPrayer(timings){
+      const order=['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+      let html='';
+      order.forEach(n=>{html+=`<div>${n}: ${timings[n]}</div>`;});
+      document.getElementById('prayerList').innerHTML=html;
+    }
+    document.getElementById('cityLookupBtn').addEventListener('click',async()=>{
+      const c=document.getElementById('cityInput').value.trim();
+      const co=document.getElementById('countryInput').value.trim();
+      if(!c||!co){alert("Enter both City and Country");return;}
+      document.getElementById('prayerList').innerHTML="Loading...";
+      try{const t=await fetchByCity(c,co); renderPrayer(t);}
+      catch(e){document.getElementById('prayerList').innerHTML="Failed to load times.";}
+    });
+    document.getElementById('locBtn').addEventListener('click',()=>{
+      if(!navigator.geolocation){alert("Location not supported");return;}
+      document.getElementById('prayerList').innerHTML="Getting location...";
+      navigator.geolocation.getCurrentPosition(async pos=>{
+        const {latitude,longitude}=pos.coords;
+        const url=`https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=2`;
+        try{const res=await fetch(url);const data=await res.json();
+          renderPrayer(data.data.timings);
+        }catch(e){document.getElementById('prayerList').innerHTML="Error fetching location times.";}
+      },()=>{document.getElementById('prayerList').innerHTML="Location denied.";});
+    });
+  </script>
+</body>
+  </html>
